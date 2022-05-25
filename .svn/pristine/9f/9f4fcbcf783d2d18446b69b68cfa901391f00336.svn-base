@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.scmDeal.dao.DailyDealDAO">
+
+	<select id="selectList" resultType="kr.happyjob.study.scmDeal.model.DailyDeal">
+	/*+ kr.happyjob.study.scmDeal.dao.DailyDealDAO.selectList */
+		  	SELECT  us.client as client
+			     ,  od.orderdate as orderdate
+			     ,  od.ordercnt as oddtcnt
+			     ,  od.orderamount as orderamount
+			     ,  od.orderpayyn as orderpayyn
+			     ,  ot.oddtno as oddtno
+			     ,  ot.oddtreqyn as oddtreqyn
+			     ,  pd.pdnm as pdnm
+		         ,  rt.rtncomdate as rtncomdate
+		         ,  ll.sumcnt as stockcnt
+		         ,  dl.cnt as dcnt
+			FROM tb_orderdetail ot
+			INNER JOIN tb_order od ON od.orderno = ot.orderno
+			INNER JOIN tb_userinfo us ON od.userID = us.loginID
+			INNER JOIN tb_pddetail pd ON pd.pdno = ot.pdno
+			INNER JOIN tb_pdmodel pm ON pm.pdmdno = pd.pdmdno AND pm.pdcode = pd.pdcode
+			INNER JOIN tb_pdcategory pc ON pm.pdcode = pc.pdcode
+			INNER JOIN tb_clientreturn crt ON ot.oddtno = crt.crtrtio
+			INNER JOIN tb_return rt ON rt.rtnno = crt.rtnno
+			LEFT OUTER JOIN  (
+			                SELECT delio, count(delio)  as cnt
+			                FROM tb_delivery
+			                GROUP BY delio
+			                ) dl ON od.orderno = dl.delio
+			LEFT OUTER JOIN  (
+			        			 	SELECT st.pdcode, st.pdmdno, st.pdno ,SUM(st.stockcnt) as sumcnt
+			              	FROM tb_stock st 
+			              	GROUP BY st.pdcode, st.pdmdno ,st.pdno
+				            	) ll on ll.pdcode = pd.pdcode and ll.pdmdno = pd.pdmdno and pd.pdno = ll.pdno
+		<where>
+			<if test="(oddtreqyn != null) and (!oddtreqyn.equals(''))">
+				AND ot.oddtreqyn = #{oddtreqyn}
+			</if>	 	
+			<if test="(ordertype != null) and (!ordertype.equals(''))">
+				<choose>
+					<when test="ordertype eq 'orderdate'.toString()">
+						<if test="(startDate != null) and (!startDate.equals(''))">
+							AND ot.oddtdate <![CDATA[>=]]> #{startDate}  
+						</if>
+						<if test="(endDate != null) and (!endDate.equals(''))">
+							AND ot.oddtdate <![CDATA[<=]]> #{endDate}  
+						</if>
+					</when>
+					<when test="ordertype eq 'rtncomdate'.toString()">
+						<if test="(startDate != null) and (!startDate.equals(''))">
+							AND rt.rtncomdate <![CDATA[>=]]> #{startDate}  
+						</if>
+						<if test="(endDate != null) and (!endDate.equals(''))">
+							AND rt.rtncomdate <![CDATA[<=]]> #{endDate}  
+						</if>
+					</when>
+				</choose>
+			</if>
+		</where>
+		ORDER  BY ot.oddtno DESC
+		LIMIT  #{pageNumber}, #{pagePostNum}
+	</select>
+	<!-- SelectList Query
+	1. FROM절에는 기준이되는 기준정보테이블을 두고 JOIN을 시작
+	2. INNER JOIN인지 OUTER JOIN인지 명확히
+	3. 1:n 관계인 것은 LEFT OUTER JOIN
+	4. when test="null비교"가 아니라 if test="null"이 아닐 때, 전체 데이터 출력	
+	5. 반품 여부 조건 하나만 쓸 때 -->
+	<!-- 
+	SELECT  us.client as client
+		     ,  od.orderdate as orderdate
+		     ,  od.ordercnt as oddtcnt
+		     ,  od.orderamount as orderamount
+		     ,  od.orderpayyn as orderpayyn
+		     ,  ot.oddtno as oddtno
+		     ,  ot.oddtreqyn as oddtreqyn
+		     ,  pm.pdmdnm as pdmdnm
+		     ,  rt.rtncomdate as rtncomdate
+		     ,  ll.sumcnt as stockcnt
+         ,  dl.cnt as dcnt
+		  FROM  tb_order od 
+    INNER JOIN  tb_userinfo us    ON us.loginID = od.userID
+	INNER JOIN  tb_orderdetail ot ON od.orderno = ot.orderno
+	INNER JOIN  tb_pdmodel pm     ON pm.pdcode = ot.pdcode AND pm.pdmdno = ot.pdmdno
+	INNER JOIN  tb_return rt      ON rt.rtnio = od.orderno
+  LEFT OUTER JOIN(
+                  SELECT delio, count(delio)  as cnt
+                  FROM tb_delivery
+                  GROUP BY delio
+                 ) dl ON od.orderno = dl.delio
+    LEFT OUTER  JOIN (
+    			 	 SELECT st.pdcode, st.pdmdno, SUM(st.stockcnt) as sumcnt
+                	 FROM tb_stock st 
+                	 GROUP BY st.pdcode, st.pdmdno
+		        	 )ll on ll.pdcode = pm.pdcode and ll.pdmdno = pm.pdmdno
+	 -->
+	
+	<select id="selectListTotal" resultType="int">
+	/*+ kr.happyjob.study.scmDeal.dao.DailyDealDAO.selectListTotal */
+		  	SELECT  count(*)
+			FROM tb_orderdetail ot
+			INNER JOIN tb_order od ON od.orderno = ot.orderno
+			INNER JOIN tb_userinfo us ON od.userID = us.loginID
+			INNER JOIN tb_pddetail pd ON pd.pdno = ot.pdno
+			INNER JOIN tb_pdmodel pm ON pm.pdmdno = pd.pdmdno AND pm.pdcode = pd.pdcode
+			INNER JOIN tb_pdcategory pc ON pm.pdcode = pc.pdcode
+			INNER JOIN tb_clientreturn crt ON ot.oddtno = crt.crtrtio
+			INNER JOIN tb_return rt ON rt.rtnno = crt.rtnno
+			LEFT OUTER JOIN  (
+			                SELECT delio, count(delio)  as cnt
+			                FROM tb_delivery
+			                GROUP BY delio
+			                ) dl ON od.orderno = dl.delio
+			LEFT OUTER JOIN  (
+			        			 	SELECT st.pdcode, st.pdmdno, st.pdno ,SUM(st.stockcnt) as sumcnt
+			              	FROM tb_stock st 
+			              	GROUP BY st.pdcode, st.pdmdno ,st.pdno
+				            	) ll on ll.pdcode = pd.pdcode and ll.pdmdno = pd.pdmdno and pd.pdno = ll.pdno
+		<where>
+			<if test="(oddtreqyn != null) and (!oddtreqyn.equals(''))">
+				AND ot.oddtreqyn = #{oddtreqyn}
+			</if>	 	
+			<if test="(ordertype != null) and (!ordertype.equals(''))">
+				<choose>
+					<when test="ordertype eq 'orderdate'.toString()">
+						<if test="(startDate != null) and (!startDate.equals(''))">
+							AND ot.oddtdate <![CDATA[>=]]> #{startDate}  
+						</if>
+						<if test="(endDate != null) and (!endDate.equals(''))">
+							AND ot.oddtdate <![CDATA[<=]]> #{endDate}  
+						</if>
+					</when>
+					<when test="ordertype eq 'rtncomdate'.toString()">
+						<if test="(startDate != null) and (!startDate.equals(''))">
+							AND rt.rtncomdate <![CDATA[>=]]> #{startDate}  
+						</if>
+						<if test="(endDate != null) and (!endDate.equals(''))">
+							AND rt.rtncomdate <![CDATA[<=]]> #{endDate}  
+						</if>
+					</when>
+				</choose>
+			</if>
+		</where>
+	</select>
+	<!-- error message : Expected one result (or null) to be returned by selectOne(), but found: 3
+	     COUNT로 인해 발생되는 컬럼이 1개여야 하는데 3개가 발생한다는 뜻
+	     
+	     <choose>
+				<when test="(oddtreqyn != null) and (!oddtreqyn.equals(''))">
+					AND ot.oddtreqyn = #{oddtreqyn}
+				</when>
+			</choose> -->
+			
+			
+	<select id="selectOne" resultType="kr.happyjob.study.scmDeal.model.DailyDeal">
+		SELECT  us.client as client
+			 ,  us.loginID as loginID
+		     ,  od.orderdate as orderdate
+		     ,  od.ordercnt as oddtcnt
+		     ,  od.orderamount as orderamount
+		     ,  od.orderpayyn as orderpayyn
+		     ,  ot.oddtno as oddtno
+		     ,  ot.oddtreqyn as oddtreqyn
+			 ,  ot.orderno as orderno
+		     ,  pm.pdnm as pdnm
+		     ,  rt.rtncomdate as rtncomdate
+		     ,  ll.sumcnt as stockcnt
+		  FROM  tb_order od 
+    INNER JOIN  tb_userinfo us    ON us.loginID = od.userID
+	INNER JOIN  tb_orderdetail ot ON od.orderno = ot.orderno
+	INNER JOIN  tb_pdmodel pm     ON pm.pdcode = ot.pdcode AND pm.pdmdno = ot.pdmdno
+	INNER JOIN  tb_return rt      ON rt.rtnio = od.orderno
+    LEFT OUTER  JOIN (
+    			 	 SELECT st.pdcode, st.pdmdno, SUM(st.stockcnt) as sumcnt
+                	 FROM tb_stock st 
+                	 GROUP BY st.pdcode, st.pdmdno
+		        	 )ll on ll.pdcode = pm.pdcode and ll.pdmdno = pm.pdmdno
+       	 WHERE  ot.oddtno = #{oddtno}
+	</select>
+	
+	<select id="selectEmployeeList" resultType="kr.happyjob.study.scmDeal.model.DailyDeal">
+		SELECT loginID as loginID
+			 , user_Type as userType
+			 , name as name
+			 , address
+			 , dtAddress
+			 , phone
+			 , email
+		  FROM tb_userinfo
+	     WHERE user_Type = "B"
+	</select>
+	
+	<!-- 1창고 -->
+	<select id="selectWhList" resultType="kr.happyjob.study.scmDeal.model.DailyDeal">
+		SELECT whcode
+		     , whnm
+		  FROM tb_warehouse
+	</select>
+	
+	<!-- 2모델명 -->
+	<select id="selectPdList" resultType="kr.happyjob.study.scmDeal.model.DailyDeal">
+		 SELECT pm.pdmdno AS pdmdno
+	          , pm.pdmdnm AS pdmdnm
+		   FROM tb_stock sk
+	 INNER JOIN tb_pdmodel pm ON sk.pdmdno = pm.pdmdno AND sk.pdcode = pm.pdcode
+		  WHERE sk.whcode = #{whcode};
+	</select>
+	
+	<!-- 3재고수량 -->
+	<select id="selectStCount" resultType="int">
+		 SELECT IFNULL(SUM(si.stockcnt), 0) AS stCntforModal
+		 FROM tb_storeinfo si
+		 WHERE si.whcode = #{whcode} 
+		   AND si.pdmdno = #{pdmdno}
+	</select>
+	
+	<insert id="insertDelivery">
+		INSERT INTO tb_delivery
+		(
+			delio
+		,	userId
+		,	delstate
+		)
+		VALUES
+		(
+			#{orderno}
+		,	#{loginID}
+		,	1
+		)
+	</insert>
+
+</mapper>

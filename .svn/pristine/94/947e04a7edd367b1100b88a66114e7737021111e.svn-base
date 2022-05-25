@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.scmDeal.dao.WarehouseInfoDAO">
+
+	<select id="selectList" resultType="kr.happyjob.study.scmDeal.model.WarehouseInfo">
+		SELECT 
+				wh.whcode as whcode
+		     ,  wh.whnm as whnm
+		     ,  wh.whplace as whplace
+		     ,  wh.whaddr as whaddr
+		     ,  wh.whzip as whzip
+		     ,  st.stockcnt as stockcnt
+		     
+		  FROM  tb_warehouse wh
+	INNER JOIN  tb_stock st ON wh.whcode = st.whcode
+		 WHERE  st.stockiono LIKE '%O%'
+	  GROUP BY  wh.whcode
+	  ORDER BY  wh.whcode
+		 LIMIT  #{pageNumber}, #{pageSize}
+	</select>
+	
+	<select id="selectListTotal" resultType="int">
+		SELECT COUNT(*)
+		FROM tb_warehouse
+	</select>
+	
+	<select id="selectDetailList" resultType="kr.happyjob.study.scmDeal.model.WarehouseInfo">
+		 SELECT pm.pdmdno as pdmdno
+	   		  , pm.pdmdnm as pdmdnm
+	     	  , ll.oddtcnt as oddtcnt
+	     	  , ll.oddtdate as oddtdate
+	     	  , ii.impdtcnt as impdtcnt
+	     	  , ii.impdtdate as impdtdate
+		   FROM tb_stock sk
+	 INNER JOIN tb_pdmodel pm ON sk.pdmdno = pm.pdmdno
+	LEFT OUTER JOIN (
+					 SELECT oddtdate
+	                      , SUM(oddtcnt) as oddtcnt
+	                      , pdmdno
+	                      , orderno
+	                   FROM tb_orderdetail
+	                 ) ll ON ll.orderno = sk.stockiono
+	LEFT OUTER JOIN (
+					 SELECT impdtdate
+	                      , SUM(impdtcnt) as impdtcnt
+	                      , pdmdno
+	                      , impordno
+	                   FROM tb_impdetail
+	                 ) ii ON ii.impordno = sk.stockiono
+	WHERE sk.whcode = #{whcode}
+  	ORDER BY ll.oddtdate
+	LIMIT  #{pageStartNo}, #{pageSize}
+	</select>
+	
+	<select id="selectDetailTotal" resultType="int">
+         SELECT COUNT(*)
+		   FROM tb_stock sk
+	 INNER JOIN tb_pdmodel pm ON sk.pdmdno = pm.pdmdno
+	LEFT OUTER JOIN (
+					 SELECT oddtdate
+	                      , SUM(oddtcnt) as oddtcnt
+	                      , pdmdno
+	                      , orderno
+	                   FROM tb_orderdetail
+	                 ) ll ON ll.orderno = sk.stockiono
+	LEFT OUTER JOIN (
+					 SELECT impdtdate
+	                      , SUM(impdtcnt) as impdtcnt
+	                      , pdmdno
+	                      , impordno
+	                   FROM tb_impdetail
+	                 ) ii ON ii.impordno = sk.stockiono
+	WHERE sk.whcode = #{whcode}
+  	ORDER BY ll.oddtdate
+	LIMIT  #{pageStartNo}, #{pageSize}
+	</select>
+
+</mapper>

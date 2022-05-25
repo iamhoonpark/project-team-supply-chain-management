@@ -1,0 +1,39 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<div id="orderApproval" class="layerPop layerType2" style="width: 550px;">
+	<dl>
+		<dt>
+			<strong>반품지시서 작성</strong>
+		</dt>
+		
+		<dd class="content">
+			<table class="col">
+				<caption>caption</caption>
+				<colgroup>
+					<col width="90px">
+					<col width="*">
+					<col width="*">
+				</colgroup>
+				<thead>
+					<tr>
+						<th scope="col">제품번호</th>
+						<th scope="col">발주제품명</th>
+						<th scope="col">발수주량</th>							
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><input type="text" class="inputTxt p100" id="" disabled="disabled"/></td>
+						<td><input type="text" class="inputTxt p100" id="" disabled="disabled"/></td>
+						<td><input type="text" class="inputTxt p100 chk" id="impdtcnt" maxlength='3'/></td>
+					</tr>
+				</tbody>
+			</table>
+			<span class="chkStrValid"></span>
+			<div class="btn_areaC mt30">
+				<a class="btnType blue" id="btnOderAppr" name="btn"><span>전송</span></a>
+				<a class="btnType blue" id="btnRedo" name="btn"><span>취소</span></a>
+			</div>
+		</dd>
+	</dl>
+	<a href="" class="closePop"><span class="hidden">닫기</span></a>
+</div>

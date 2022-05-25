@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.happyjob.study.buyImportrtn.dao.BuyImportDAO">
+
+	<!-- 발주지시서 목록 -->
+	<select id="selectImportList" resultType="kr.happyjob.study.buyImportrtn.model.BuyImport">
+	/*+ kr.happyjob.study.buyImportrtn.dao.BuyImportDAO.selectImportList */
+		SELECT	id.impordno as impordno
+		,		ip.impno as impno
+		,		id.impdtdate as impdtdate
+		,		ip.imppayyn as imppayyn
+		,		id.impdtcnt as impdtcnt
+		,		us.client as client
+		,		ip.impmgryn as impmgryn
+		,		id.pdmdno as pdmdno
+		,		pm.pdmdnm as pdmdnm
+		FROM       tb_import ip
+		INNER JOIN tb_impdetail id ON ip.impno = id.impno
+		INNER JOIN tb_userinfo us ON ip.userID = us.loginID
+		INNER JOIN tb_pdmodel pm ON pm.pdcode = id.pdcode AND pm.pdmdno = id.pdmdno
+		<where>
+			<if test="(searchWord != null) and (!searchWord.equals(''))">
+				<choose>
+					<when test="searchType eq '1'.toString()">
+						AND  us.client LIKE CONCAT('%', #{searchWord} ,'%')
+					</when>
+					<when test="searchType eq '2'.toString()">
+						AND  pm.pdmdnm LIKE CONCAT('%', #{searchWord} ,'%')
+					</when>
+				</choose>
+			</if>
+			<choose>
+				<when test="searchType eq '3'.toString()">				   
+					AND  ip.impmgryn = 'Y'
+					<if test="(searchWord != null) and (!searchWord.equals(''))">
+						AND (	
+							us.client LIKE CONCAT('%', #{searchWord} ,'%')
+						OR  pm.pdmdnm LIKE CONCAT('%', #{searchWord} ,'%')
+							)
+					</if>
+				</when>
+				<when test="searchType eq '4'.toString()">
+					AND ip.impmgryn = 'N'
+					<if test="(searchWord != null) and (!searchWord.equals(''))">
+						AND (	
+							us.client LIKE CONCAT('%', #{searchWord} ,'%')
+						OR  pm.pdmdnm LIKE CONCAT('%', #{searchWord} ,'%')
+							)
+					</if>
+				</when>
+			</choose>
+			<if test="(startDate != null) and (!startDate.equals(''))">
+				AND id.impdtdate <![CDATA[>=]]> STR_TO_DATE(#{startDate}, '%Y-%m-%d')
+			</if>
+			<if test="(endDate != null) and (!endDate.equals(''))">
+				AND id.impdtdate <![CDATA[<=]]> STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+			</if>
+		</where>
+		ORDER BY id.impordno
+		LIMIT #{pageIndex}, #{pageSize}
+	</select>
+	<!-- ComboBox에서 임원승인·미승인을 선택할 경우 업체·제품명이 검색되도록 설정 -->
+	
+	<select id="selectImportTotal" resultType="int">
+	/*+ kr.happyjob.study.buyImportrtn.dao.BuyImportDAO.selectImportTotal */
+		SELECT	   COUNT(id.impordno)
+		FROM       tb_import ip
+		INNER JOIN tb_impdetail id ON ip.impno = id.impno
+		INNER JOIN tb_userinfo us ON ip.userID = us.loginID
+		INNER JOIN tb_pdmodel pm ON pm.pdcode = id.pdcode AND pm.pdmdno = id.pdmdno
+		<where>
+			<if test="(searchWord != null) and (!searchWord.equals(''))">
+				<choose>
+					<when test="searchType eq '1'.toString()">
+						AND  us.client LIKE CONCAT('%', #{searchWord} ,'%')
+					</when>
+					<when test="searchType eq '2'.toString()">
+						AND  pm.pdmdnm LIKE CONCAT('%', #{searchWord} ,'%')
+					</when>
+				</choose>
+			</if>
+			<choose>
+				<when test="searchType eq '3'.toString()">				   
+					AND  ip.impmgryn = 'Y'
+					<if test="(searchWord != null) and (!searchWord.equals(''))">
+						AND (	
+							us.client LIKE CONCAT('%', #{searchWord} ,'%')
+						OR  pm.pdmdnm LIKE CONCAT('%', #{searchWord} ,'%')
+							)
+					</if>
+				</when>
+				<when test="searchType eq '4'.toString()">
+					AND ip.impmgryn = 'N'
+					<if test="(searchWord != null) and (!searchWord.equals(''))">
+						AND (	
+							us.client LIKE CONCAT('%', #{searchWord} ,'%')
+						OR  pm.pdmdnm LIKE CONCAT('%', #{searchWord} ,'%')
+							)
+					</if>
+				</when>
+			</choose>
+			<if test="(startDate != null) and (!startDate.equals(''))">
+				AND id.impdtdate <![CDATA[>=]]> STR_TO_DATE(#{startDate}, '%Y-%m-%d')
+			</if>
+			<if test="(endDate != null) and (!endDate.equals(''))">
+				AND id.impdtdate <![CDATA[<=]]> STR_TO_DATE(#{endDate}, '%Y-%m-%d')
+			</if>
+		</where>
+		ORDER BY   id.impordno
+	</select>
+	
+	<!-- 발주지시서 단건 조회 -->
+	<select id="selectImportOne" resultType="kr.happyjob.study.buyImportrtn.model.BuyImport">
+		SELECT	id.impordno as impordno
+		,		ip.impno as impno
+		,		id.impdtdate as impdtdate
+		,		ip.imppayyn as imppayyn
+		,		id.impdtcnt as impdtcnt
+		,		us.client as client
+		,		ip.impmgryn as impmgryn
+		,		id.pdmdno as pdmdno
+		,		pm.pdmdnm as pdmdnm
+		FROM       tb_import ip
+		INNER JOIN tb_impdetail id ON ip.impno = id.impno
+		INNER JOIN tb_userinfo us ON ip.userID = us.loginID
+		INNER JOIN tb_pdmodel pm ON pm.pdcode = id.pdcode AND pm.pdmdno = id.pdmdno
+   		WHERE id.impordno = #{impordno}
+	</select>
+
+</mapper>

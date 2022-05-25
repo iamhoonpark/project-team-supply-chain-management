@@ -1,0 +1,121 @@
+package kr.happyjob.study.scmDeal.model;
+
+import java.sql.Date;
+
+public class WarehouseInfo {
+	
+	private int    whcode    //창고번호
+			  ,    stockcnt  //재고수량
+			  ,    oddtcnt   //입고량
+			  ,    impdtcnt; //출고량
+	private Date   oddtdate  //입고일시
+				 , impdtdate;//출고일시
+	private String whnm      //창고이름
+	             , whplace   //창고주소
+	             , whaddr	 //창고상세주소
+	             , whzip	 //창고우편번호
+				 , pdmdno    //모델번호
+				 , pdmdnm;   //모델명
+	
+	public WarehouseInfo() {
+		
+	}
+
+	public int getWhcode() {
+		return whcode;
+	}
+
+	public void setWhcode(int whcode) {
+		this.whcode = whcode;
+	}
+
+	public int getStockcnt() {
+		return stockcnt;
+	}
+
+	public void setStockcnt(int stockcnt) {
+		this.stockcnt = stockcnt;
+	}
+
+	public String getWhnm() {
+		return whnm;
+	}
+
+	public void setWhnm(String whnm) {
+		this.whnm = whnm;
+	}
+
+	public String getWhplace() {
+		return whplace;
+	}
+
+	public void setWhplace(String whplace) {
+		this.whplace = whplace;
+	}
+
+	public String getWhaddr() {
+		return whaddr;
+	}
+
+	public void setWhaddr(String whaddr) {
+		this.whaddr = whaddr;
+	}
+
+	public String getWhzip() {
+		return whzip;
+	}
+
+	public void setWhzip(String whzip) {
+		this.whzip = whzip;
+	}
+
+	public Date getOddtdate() {
+		return oddtdate;
+	}
+
+	public void setOddtdate(Date oddtdate) {
+		this.oddtdate = oddtdate;
+	}
+
+	public Date getImpdtdate() {
+		return impdtdate;
+	}
+
+	public void setImpdtdate(Date impdtdate) {
+		this.impdtdate = impdtdate;
+	}
+
+	public int getOddtcnt() {
+		return oddtcnt;
+	}
+
+	public void setOddtcnt(int oddtcnt) {
+		this.oddtcnt = oddtcnt;
+	}
+
+	public int getImpdtcnt() {
+		return impdtcnt;
+	}
+
+	public void setImpdtcnt(int impdtcnt) {
+		this.impdtcnt = impdtcnt;
+	}
+
+	public String getPdmdno() {
+		return pdmdno;
+	}
+
+	public void setPdmdno(String pdmdno) {
+		this.pdmdno = pdmdno;
+	}
+
+	public String getPdmdnm() {
+		return pdmdnm;
+	}
+
+	public void setPdmdnm(String pdmdnm) {
+		this.pdmdnm = pdmdnm;
+	}
+	
+
+}
